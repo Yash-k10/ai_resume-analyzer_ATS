@@ -131,6 +131,3 @@ python app.py
 
 ---
 
-## Viva Explanation
-
-This system uses NLP preprocessing techniques such as tokenization and lemmatization, along with transformer-based sentence embeddings, to compute semantic similarity between resumes and job descriptions. A hybrid scoring approach combining semantic similarity and skill-based matching is used to simulate real-world ATS systems.
