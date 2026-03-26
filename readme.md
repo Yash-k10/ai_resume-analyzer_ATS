@@ -70,6 +70,7 @@ Skill score
 Resumes are ranked accordingly
 
 📊 Output
+
 📈 Match Percentage
 
 🏆 Ranking of resumes
