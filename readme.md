@@ -1,7 +1,9 @@
 🚀 AI Resume Analyzer & ATS System
 
 👨‍💻 Developed by: Yash Kapse
+
 An intelligent NLP-based web application that analyzes multiple resumes and ranks them based on a given Job Description (JD) using Machine Learning, NLP, and Transformer-based models.
+
 
 📌 Features
 ✅ Upload multiple resumes (PDF)
@@ -11,6 +13,7 @@ An intelligent NLP-based web application that analyzes multiple resumes and rank
 ✅ Semantic similarity using BERT (MiniLM)
 ✅ ATS-style scoring system
 ✅ Clean Bootstrap UI
+
 
 🧠 Technologies Used
 Python (Flask)
