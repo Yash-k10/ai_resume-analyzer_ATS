@@ -1,42 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Analysis Result</title>
+    <title>Results</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
 
-<h2>ATS Score: {{score}} / 100</h2>
-<h2>JD Match: {{match}} %</h2>
+<body class="bg-light">
 
-<hr>
+<div class="container mt-5">
 
-<h3>✅ Strong Points:</h3>
-<ul>
-    {% for s in strengths %}
-        <li>{{s}}</li>
-    {% endfor %}
-</ul>
+    <h2 class="text-center mb-4">📊 Resume Ranking Results</h2>
 
-<hr>
+    <table class="table table-bordered table-striped shadow">
+        <thead class="table-dark">
+            <tr>
+                <th>Rank</th>
+                <th>Resume</th>
+                <th>ATS Score</th>
+                <th>Match %</th>
+                <th>Missing Skills</th>
+            </tr>
+        </thead>
 
-<h3>⚠️ Missing Skills (Based on JD):</h3>
-<ul>
-    {% for m in missing %}
-        <li>{{m}}</li>
-    {% endfor %}
-</ul>
+        <tbody>
+        {% for r in results %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ r.name }}</td>
+                <td>{{ r.score }}</td>
+                <td>{{ r.match }}</td>
+                <td>
+                    {% if r.missing %}
+                        {% for m in r.missing %}
+                            <span class="badge bg-danger">{{m}}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-success">No major gaps</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
-<hr>
+    <div class="text-center mt-3">
+        <a href="/" class="btn btn-secondary">⬅️ Go Back</a>
+    </div>
 
-<h3>💡 Suggestions:</h3>
-<ul>
-    {% for tip in tips %}
-        <li>{{tip}}</li>
-    {% endfor %}
-</ul>
-
-<br>
-<a href="/">⬅️ Go Back</a>
+</div>
 
 </body>
 </html>

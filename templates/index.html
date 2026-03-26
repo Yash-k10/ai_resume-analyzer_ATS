@@ -2,18 +2,39 @@
 <html>
 <head>
     <title>AI Resume Analyzer</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
-<body>
+<body class="bg-light">
 
-<h2>Upload Resume</h2>
+<div class="container mt-5">
 
-<form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="resume" required><br><br>
+    <div class="text-center">
+        <h1>🚀 AI Resume Analyzer</h1>
+        <p class="text-muted">By Yash Kapse</p>
+    </div>
 
-    <textarea name="jd" placeholder="Paste Job Description..." rows="6" cols="50"></textarea><br><br>
+    <div class="card p-4 shadow mt-4">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            
+            <div class="mb-3">
+                <label class="form-label">Upload Resumes</label>
+                <input type="file" name="resume" class="form-control" multiple required>
+            </div>
 
-    <button type="submit">Analyze</button>
-</form>
+            <div class="mb-3">
+                <label class="form-label">Job Description</label>
+                <textarea name="jd" class="form-control" rows="5"></textarea>
+            </div>
+
+            <button class="btn btn-primary w-100">Analyze & Rank</button>
+
+        </form>
+    </div>
+
+</div>
 
 </body>
 </html>

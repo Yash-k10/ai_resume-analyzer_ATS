@@ -1,9 +1,15 @@
 from flask import Flask, render_template, request
 import os
 import PyPDF2
+import nltk
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+from nltk.stem import WordNetLemmatizer
+from sentence_transformers import SentenceTransformer, util
+
+# NLTK setup
+nltk.download('punkt')
+nltk.download('punkt_tab')
+nltk.download('wordnet')
 
 app = Flask(__name__)
 
@@ -11,25 +17,20 @@ UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+lemmatizer = WordNetLemmatizer()
 
-# 🔹 ATS Score
-def ats_score(text):
-    keywords = [
-        "python", "machine learning", "data analysis",
-        "sql", "project", "internship", "deep learning"
-    ]
-
-    score = 0
-    text = text.lower()
-
-    for word in keywords:
-        if word in text:
-            score += 100 / len(keywords)
-
-    return round(score, 2)
+# 🔥 Load AI model (once)
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
 
-# 🔹 PDF → Text
+# 🔹 Preprocess
+def preprocess(text):
+    tokens = nltk.word_tokenize(text.lower())
+    tokens = [lemmatizer.lemmatize(w) for w in tokens if w.isalnum()]
+    return " ".join(tokens)
+
+
+# 🔹 Extract PDF
 def extract_text(pdf_path):
     text = ""
     with open(pdf_path, "rb") as file:
@@ -40,80 +41,54 @@ def extract_text(pdf_path):
     return text
 
 
-# 🔹 JD Matching
-def match_score(resume_text, jd_text):
-    tfidf = TfidfVectorizer()
-    vectors = tfidf.fit_transform([resume_text, jd_text])
-    similarity = cosine_similarity(vectors[0], vectors[1])
-    return round(similarity[0][0] * 100, 2)
+# 🔹 Skill List (important)
+skills_list = [
+    "python", "sql", "machine learning", "deep learning",
+    "nlp", "flask", "django", "react", "api", "aws",
+    "docker", "tensorflow", "pandas", "numpy"
+]
 
 
-# 🔹 Suggestions
-def suggestions(text):
-    tips = []
-    text = text.lower()
+# 🔹 Skill Score
+def skill_score(resume, jd):
+    match = 0
+    total = 0
 
-    if "project" not in text:
-        tips.append("Add projects section")
+    for skill in skills_list:
+        if skill in jd:
+            total += 1
+            if skill in resume:
+                match += 1
 
-    if "python" not in text:
-        tips.append("Add Python skill")
-
-    if "internship" not in text:
-        tips.append("Mention internship experience")
-
-    return tips
+    return (match / total) if total != 0 else 0
 
 
-# 🔹 Strong Points
-def strong_points(text):
-    strengths = []
-    text = text.lower()
+# 🔹 🔥 BERT Semantic Score
+def semantic_score(resume, jd):
+    emb1 = model.encode(resume, convert_to_tensor=True)
+    emb2 = model.encode(jd, convert_to_tensor=True)
 
-    if "python" in text:
-        strengths.append("Good knowledge of Python")
+    sim = util.cos_sim(emb1, emb2)
+    return sim.item()
 
-    if "machine learning" in text:
-        strengths.append("Machine Learning experience")
 
-    if "project" in text:
-        strengths.append("Project experience present")
+# 🔹 🔥 FINAL HYBRID SCORE
+def final_score(resume, jd):
+    sem = semantic_score(resume, jd)
+    skill = skill_score(resume, jd)
 
-    if "internship" in text:
-        strengths.append("Has internship experience")
+    # weighted combination
+    final = (0.7 * sem) + (0.3 * skill)
 
-    return strengths
+    return round(final * 100, 2)
 
 
 # 🔹 Missing Skills
-def missing_skills(resume_text, jd_text):
-    if not jd_text:
-        return []
-
-    resume_text = resume_text.lower()
-    jd_text = jd_text.lower()
-
-    # ❌ Ignore useless words
-    ignore_words = [
-        "and", "the", "with", "for", "you", "are", "job", "role",
-        "title", "description", "experience", "years", "location",
-        "remote", "hybrid", "work", "team", "good", "skills"
-    ]
-
-    # ✅ Important skill keywords (customizable 🔥)
-    skill_keywords = [
-        "python", "java", "sql", "machine learning", "deep learning",
-        "data analysis", "nlp", "tensorflow", "pandas", "numpy",
-        "flask", "django", "react", "node", "api", "docker", "aws"
-    ]
-
+def missing_skills(resume, jd):
     missing = []
-
-    # 🔍 Check only important skills
-    for skill in skill_keywords:
-        if skill in jd_text and skill not in resume_text:
+    for skill in skills_list:
+        if skill in jd and skill not in resume:
             missing.append(skill)
-
     return missing
 
 
@@ -124,33 +99,34 @@ def home():
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    file = request.files["resume"]
+    files = request.files.getlist("resume")
     jd = request.form.get("jd")
 
-    if file:
-        filepath = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
-        file.save(filepath)
+    results = []
 
-        text = extract_text(filepath)
+    clean_jd = preprocess(jd) if jd else ""
 
-        score = ats_score(text)
+    for file in files:
+        if file:
+            path = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
+            file.save(path)
 
-        match = 0
-        if jd:
-            match = match_score(text, jd)
+            text = extract_text(path)
+            clean_text = preprocess(text)
 
-        tips = suggestions(text)
-        strengths = strong_points(text)
-        missing = missing_skills(text, jd)
+            score = final_score(clean_text, clean_jd)
+            missing = missing_skills(clean_text, clean_jd)
 
-        return render_template("result.html",
-                               score=score,
-                               match=match,
-                               tips=tips,
-                               strengths=strengths,
-                               missing=missing)
+            results.append({
+                "name": file.filename,
+                "match": score,
+                "missing": missing
+            })
 
-    return "No file uploaded"
+    # 🔥 Rank properly
+    results = sorted(results, key=lambda x: x["match"], reverse=True)
+
+    return render_template("result.html", results=results)
 
 
 if __name__ == "__main__":
