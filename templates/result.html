@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analysis Result</title>
+</head>
+<body>
+
+<h2>ATS Score: {{score}} / 100</h2>
+<h2>JD Match: {{match}} %</h2>
+
+<hr>
+
+<h3>✅ Strong Points:</h3>
+<ul>
+    {% for s in strengths %}
+        <li>{{s}}</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h3>⚠️ Missing Skills (Based on JD):</h3>
+<ul>
+    {% for m in missing %}
+        <li>{{m}}</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h3>💡 Suggestions:</h3>
+<ul>
+    {% for tip in tips %}
+        <li>{{tip}}</li>
+    {% endfor %}
+</ul>
+
+<br>
+<a href="/">⬅️ Go Back</a>
+
+</body>
+</html>

@@ -51,17 +51,70 @@ def match_score(resume_text, jd_text):
 # 🔹 Suggestions
 def suggestions(text):
     tips = []
+    text = text.lower()
 
-    if "project" not in text.lower():
+    if "project" not in text:
         tips.append("Add projects section")
 
-    if "python" not in text.lower():
+    if "python" not in text:
         tips.append("Add Python skill")
 
-    if "internship" not in text.lower():
+    if "internship" not in text:
         tips.append("Mention internship experience")
 
     return tips
+
+
+# 🔹 Strong Points
+def strong_points(text):
+    strengths = []
+    text = text.lower()
+
+    if "python" in text:
+        strengths.append("Good knowledge of Python")
+
+    if "machine learning" in text:
+        strengths.append("Machine Learning experience")
+
+    if "project" in text:
+        strengths.append("Project experience present")
+
+    if "internship" in text:
+        strengths.append("Has internship experience")
+
+    return strengths
+
+
+# 🔹 Missing Skills
+def missing_skills(resume_text, jd_text):
+    if not jd_text:
+        return []
+
+    resume_text = resume_text.lower()
+    jd_text = jd_text.lower()
+
+    # ❌ Ignore useless words
+    ignore_words = [
+        "and", "the", "with", "for", "you", "are", "job", "role",
+        "title", "description", "experience", "years", "location",
+        "remote", "hybrid", "work", "team", "good", "skills"
+    ]
+
+    # ✅ Important skill keywords (customizable 🔥)
+    skill_keywords = [
+        "python", "java", "sql", "machine learning", "deep learning",
+        "data analysis", "nlp", "tensorflow", "pandas", "numpy",
+        "flask", "django", "react", "node", "api", "docker", "aws"
+    ]
+
+    missing = []
+
+    # 🔍 Check only important skills
+    for skill in skill_keywords:
+        if skill in jd_text and skill not in resume_text:
+            missing.append(skill)
+
+    return missing
 
 
 @app.route("/")
@@ -87,11 +140,15 @@ def upload():
             match = match_score(text, jd)
 
         tips = suggestions(text)
+        strengths = strong_points(text)
+        missing = missing_skills(text, jd)
 
         return render_template("result.html",
                                score=score,
                                match=match,
-                               tips=tips)
+                               tips=tips,
+                               strengths=strengths,
+                               missing=missing)
 
     return "No file uploaded"
 
