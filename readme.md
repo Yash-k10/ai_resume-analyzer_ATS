@@ -1,39 +1,40 @@
-🚀 AI Resume Analyzer & ATS System
+AI Resume Analyzer & ATS System
+Developed by: Yash Kapse
+An NLP-based web application that analyzes multiple resumes and ranks them against a given Job Description (JD) using Machine Learning and transformer-based semantic models.
 
-👨‍💻 Developed by: Yash Kapse
+Overview
+This system simulates an Applicant Tracking System (ATS) by evaluating resumes based on both semantic similarity and skill matching. It leverages Natural Language Processing (NLP) techniques along with transformer-based embeddings to improve matching accuracy.
 
-An intelligent NLP-based web application that analyzes multiple resumes and ranks them based on a given Job Description (JD) using Machine Learning, NLP, and Transformer-based models.
+Key Features
+Upload and analyze multiple resumes (PDF format)
 
+Extract and preprocess text using NLP techniques
 
-📌 Features
-✅ Upload multiple resumes (PDF)
-✅ Extract text using NLP
-✅ Resume ranking based on JD
-✅ Missing skills detection
-✅ Semantic similarity using BERT (MiniLM)
-✅ ATS-style scoring system
-✅ Clean Bootstrap UI
+Rank resumes based on job description relevance
 
+Identify missing skills based on JD requirements
 
-🧠 Technologies Used
+Compute semantic similarity using transformer models (MiniLM)
+
+Hybrid scoring mechanism (semantic + skill-based)
+
+Clean and responsive web interface using Bootstrap
+
+Technologies Used
+Backend
 Python (Flask)
 
-Natural Language Processing (NLP)
-
+Natural Language Processing
 Tokenization
 
 Lemmatization
 
-Machine Learning
+Machine Learning & Deep Learning
+TF-IDF (baseline comparison)
 
-TF-IDF (baseline)
-
-Deep Learning
-
-Sentence Transformers (MiniLM - BERT)
+Sentence Transformers (MiniLM - BERT-based model)
 
 Libraries
-
 NLTK
 
 Scikit-learn
@@ -42,37 +43,32 @@ PyPDF2
 
 Sentence-Transformers
 
-⚙️ How It Works
-User uploads multiple resumes
+System Workflow
+User uploads one or more resumes
 
-User provides Job Description
+User inputs a Job Description (JD)
 
-System:
+The system performs:
 
-Extracts text from PDFs
+PDF text extraction
 
-Cleans text using NLP
+Text preprocessing (tokenization and lemmatization)
 
-Applies lemmatization & preprocessing
+Semantic similarity computation using transformer embeddings
 
-Computes:
+Skill-based matching
 
-Semantic similarity (BERT)
+A hybrid score is calculated using:
 
-Skill matching score
+Semantic similarity score
 
-Final score = Hybrid of:
+Skill match score
 
-Semantic score
+Resumes are ranked based on the final score
 
-Skill score
+Output
+Match percentage for each resume
 
-Resumes are ranked accordingly
+Ranked list of resumes
 
-📊 Output
-
-📈 Match Percentage
-
-🏆 Ranking of resumes
-
-⚠️ Missing skills (based on JD)
+Missing skills identified from the Job Description
